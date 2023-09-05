@@ -1,10 +1,11 @@
 const { ApplicationCommandOptionType, EmbedBuilder } = require('discord.js')
 
 const Itens = require('../../handler/itemhandler')
+const { autenticator } = require('../../handler/authhandler')
 
 module.exports = class Item {
     constructor(client) {
-        this.client = client
+        client
         this.name = 'item'
         this.description = 'Calcula a porcentagem de lucro de um item'
         this.options = [{
@@ -42,10 +43,13 @@ module.exports = class Item {
             const cliente = options.getString('cliente')
             const quant = options.getNumber('quantidade')
             const itens = new Itens()
+            const auth = await autenticator(user.id)
+            if (!auth) return interaction.reply({content: 'Você não pode utilizar esse comando pois seu registro não está na base de dados, fale com um administrador.'})
             const { itemNome, valorCompraMorador, valorVendaMorador, valorCompraFuncionario, valorVendaFuncionario, lucroMorador, lucroFuncionario } = await itens.get(id)
             if (cliente === '1') {
                 lucro = (valorVendaMorador * (lucroMorador * 0.01)) * quant
                 fields = [ 
+                    { name: '📋 RG do usuário', value: auth.toString(), inline: true},
                     { name: '💳 Valor de compra', value: (valorCompraMorador * quant).toString(), inline: true },
                     { name: '💰 Valor de venda', value: (valorVendaMorador * quant).toString(), inline: true },
                     { name: '📋 Quantidade', value: quant.toString(), inline: true },
@@ -56,6 +60,7 @@ module.exports = class Item {
             else if (cliente === '2') {
                 lucro = (valorVendaFuncionario * (lucroFuncionario * 0.01)) * quant
                 fields = [ 
+                    { name: '📋 RG do usuário', value: auth.toString(), inline: true},
                     { name: '💳 Valor de compra', value: (valorCompraFuncionario * quant).toString(), inline: true },
                     { name: '💰 Valor de venda', value: (valorVendaFuncionario * quant).toString(), inline: true },
                     { name: '📋 Quantidade', value: quant.toString(), inline: true },

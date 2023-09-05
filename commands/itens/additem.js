@@ -1,9 +1,10 @@
 const { ApplicationCommandOptionType } = require('discord.js')
+const { changeParams } = require('../../handler/choicehandler')
 const Itens = require('../../handler/itemhandler')
 
 module.exports = class addItem {
     constructor(client) {
-        this.client = client
+        client
         this.name = 'additem'
         this.description = 'Adiciona um novo item à lista'
         this.options = [{
@@ -62,45 +63,7 @@ module.exports = class addItem {
                 return interaction.reply({content: 'Já existe um item com este ID'})
             } else {
                 item.add(id, itemNome, valorCompraMorador, valorVendaMorador, valorCompraFuncionario, valorVendaFuncionario, lucroMorador, lucroFuncionario)
-                let choices = [];
-                const params = await item.getParams()
-                params.forEach(item => {
-                    const newItem = `${item.itemID} - ${item.itemNome}`
-                    const newChoice = {
-                        name: newItem,
-                        value: item.itemID
-                    }
-                    choices.push(newChoice)
-                })
-                client.application.commands.edit('1148288678834225336', { 
-                    options:  [{
-                        name: 'codigo',
-                        description: 'Informe o código do item desejado',
-                        required: true,
-                        type: ApplicationCommandOptionType.String,
-                        choices: choices
-                    }, {
-                        name: 'quantidade',
-                        description: 'Informe a quantidade de itens que você possui',
-                        required: true,
-                        type: ApplicationCommandOptionType.Number
-                    }, {
-                        name: 'cliente',
-                        description: 'Informe o código de cliente desejado',
-                        required: true,
-                        type: ApplicationCommandOptionType.String,
-                        choices: [
-                            {
-                                name: '1 - Morador',
-                                value: '1'
-                            },
-                            {
-                                name: '2 - Funcionário público',
-                                value: '2'
-                            }
-                        ]
-                    }]
-                })
+                await changeParams(client, item)
                 return interaction.reply({content: 'Item adicionado com sucesso à base de dados, reinicie o discord caso a lista de parâmetros do comando **/item** não seja atualizada.'})
             }
         }

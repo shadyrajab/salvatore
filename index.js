@@ -19,29 +19,45 @@ client.on('ready', client => {
 })
 
 client.on('interactionCreate', async interaction => {
-    const { commandName, member, memberPermissions } = interaction
+    const { commandName, memberPermissions } = interaction
 
     const command = commands.find(command => command.name === commandName)
 
     if (commandName === 'additem') {
         const permission = memberPermissions.has('Administrator')
         if (!permission) return interaction.reply({content: 'Somente administradores podem utilizar este comando!', ephemeral: true})
-        command.execute(interaction)
+        try {
+            command.execute(interaction)
+        } catch {
+            return interaction.reply('Ocorreu algum erro no comando, contate um administrador!')
+        } 
     }
 
     else if (commandName === 'item') {
         try {
             command.execute(interaction)
         } catch {
-
+            return interaction.reply('Ocorreu algum erro no comando, contate um administrador!')
         } 
     }
 
     else if (commandName === 'delitem') {
+        const permission = memberPermissions.has('Administrator')
+        if (!permission) return interaction.reply({content: 'Somente administradores podem utilizar este comando!', ephemeral: true})
         try {
             command.execute(interaction)
         } catch {
+            return interaction.reply('Ocorreu algum erro no comando, contate um administrador!')
+        }
+    }
 
+    else if (commandName === 'auth') {
+        const permission = memberPermissions.has('Administrator')
+        if (!permission) return interaction.reply({content: 'Somente administradores podem utilizar este comando!', ephemeral: true})
+        try {
+            command.execute(interaction)
+        } catch {
+            return interaction.reply('Ocorreu algum erro no comando, contate um administrador!')
         }
     }
 })
